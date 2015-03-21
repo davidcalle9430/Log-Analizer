@@ -57,7 +57,7 @@ int NumeroProcesosUnProcesador( int inicio, int fin, Proceso* procesos, int* res
 
 
 
- 	int main(int argc, char *argv[]){
+ int main(int argc, char *argv[]){
     int shmid,shmid2;
     key_t key,key2;
     char *shm,*shm2;
