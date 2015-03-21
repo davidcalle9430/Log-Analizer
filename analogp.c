@@ -12,7 +12,7 @@
 	Fecha última modificación: 
 		marzo 21 de 2015
 	*/
-
+    
    int main(int argc, char *argv[])
    {   
 		int resultado, opcion, resultado3[3],numero, contador, contador_lineas,i;
