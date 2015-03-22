@@ -27,7 +27,7 @@ typedef struct{
   Proceso* procesos;
   int inicio;
   int fin;
-  int *respuesta;
+  float *respuesta;
   
 }Parametro;
 
@@ -66,7 +66,43 @@ void* NumeroProcesosMasDe64(Parametro *parametro){
   //pthread_exit(retorno);
 }
 
+void* NumeroProcesosUtilizaMasCPU(Parametro *parametro){
+  int i;
+  float valor;
+  
+  for (i =parametro->inicio; i < parametro->fin; i++)
+  { 
+     valor=parametro->procesos[i].tiempo_promedio_cpu;
+    if(valor>parametro->respuesta[0]){
+      parametro->respuesta[0]=valor;
+      parametro->respuesta[1]=parametro->procesos[i].numero_tarea;
+      parametro->respuesta[2]=parametro->procesos[i].memoria_usada;
+    }
+  }
+  //printf(" al final el retorno es %i \n",*retorno );
+  //pthread_exit(retorno);
+}
 
+void* ProcesosInteractivos(Parametro *parametro){
+  int  i, valor;
+  for (i =parametro->inicio; i < parametro->fin; i++)
+  { 
+     valor=parametro->procesos[i].numero_cola;
+    if(valor==0){
+      parametro->respuesta[0]++;
+    }
+  }
+}
+void* EjecucionCancelada(Parametro *parametro){
+  int  i, valor;
+  for (i =parametro->inicio; i < parametro->fin; i++)
+  { 
+     valor=parametro->procesos[i].status;
+    if(valor==5){
+      parametro->respuesta[0]++;
+    }
+  }
+}
 int main(int argc, char *argv[])
  {      
   FILE * fp;
@@ -74,16 +110,12 @@ int main(int argc, char *argv[])
   char *line, *lee, basura;
   size_t len;
   ssize_t read;
-  int i,contador, contador_lineas, cantidad_hilos, aumento, cantidad_lineas,opcion, *acum, *resultado;
+  int i,contador, contador_lineas, cantidad_hilos, aumento, cantidad_lineas,opcion, *acum;
+  float *resultado;
   double datos[18];
   Proceso* procesos;
   Parametro *p;
-   pthread_t *hilos;
-  //pthread_t* hilos;
-
-
-  
-  
+  pthread_t *hilos;
 
   fp = fopen(argv[1], "r");
   if (fp == NULL){
@@ -93,7 +125,7 @@ int main(int argc, char *argv[])
     contador_lineas=0;
     //resultado=0;
     len = 0;
-    resultado= (int*) malloc(sizeof(int)*3);
+    resultado= (float*) malloc(sizeof(float)*3);
     resultado[0]=0;
     resultado[1]=0;
     resultado[2]=0;
@@ -152,8 +184,8 @@ int main(int argc, char *argv[])
         
       
         if(opcion==1){
-          hilos = (pthread_t*) malloc(sizeof(pthread_t)*cantidad_hilos);
-          p=(Parametro*) malloc((sizeof(Parametro)*cantidad_hilos));
+          hilos =  malloc(sizeof(pthread_t)*cantidad_hilos);
+          p= malloc((sizeof(Parametro)*cantidad_hilos));
           for (i = 0; i < cantidad_hilos; i++)
           { 
             p[i].procesos = procesos;
@@ -169,13 +201,13 @@ int main(int argc, char *argv[])
             //resultado+= *acum;
 
           }
-          printf("El numero  de procesos que se ejecutó únicamente en un procesador es: %i\n", resultado[0]);
+          printf("El numero  de procesos que se ejecutó únicamente en un procesador es: %f\n", resultado[0]);
           free(hilos);
           free(p);
         }else if(opcion==2){
 
-          hilos = (pthread_t*) malloc(sizeof(pthread_t)*cantidad_hilos);
-          p=(Parametro*) malloc((sizeof(Parametro)*cantidad_hilos));
+          hilos =  malloc(sizeof(pthread_t)*cantidad_hilos);
+          p= malloc((sizeof(Parametro)*cantidad_hilos));
           for (i = 0; i < cantidad_hilos; i++)
           { 
             p[i].procesos = procesos;
@@ -191,22 +223,82 @@ int main(int argc, char *argv[])
             //resultado+= *acum;
 
           }
-          printf("El numero  de procesos que se ejecutó únicamente en un procesador es: %i\n", resultado[0]);
+          printf("El numero  de procesos en más de 64 procesadores es: %f\n", resultado[0]);
           free(hilos);
           free(p);
 
 
     
         }else if(opcion==3){
-        
+          hilos =  malloc(sizeof(pthread_t)*cantidad_hilos);
+          p= malloc((sizeof(Parametro)*cantidad_hilos));
+                   for (i = 0; i < cantidad_hilos; i++)
+          { 
+            p[i].procesos = procesos;
+            p[i].inicio= aumento *i;
+            p[i].fin= (aumento * i)+ aumento;
+            p[i].respuesta=resultado;
+            pthread_create(&(hilos[i]), NULL, (void*) NumeroProcesosUtilizaMasCPU, (void*) &(p[i ]));
+          }
+          // joineo los hilos
+          for (i = 0; i < cantidad_hilos; i++)
+          { 
+            pthread_join(hilos[i],NULL);
+            //resultado+= *acum;
+
+          }
+          printf("Proceso que utilizó más CPU: %f  ;", resultado[1] );
+          printf("Tiempo de uso de CPU: %f  ;", resultado[0]);
+          printf("Memoria utilizada: %f\n", resultado[2]);
+          free(hilos);
+          free(p);
           
         }else if(opcion==4){
-          
-        }else if(opcion==5){
+         hilos =  malloc(sizeof(pthread_t)*cantidad_hilos);
+          p= malloc((sizeof(Parametro)*cantidad_hilos));
+          for (i = 0; i < cantidad_hilos; i++)
+          { 
+            p[i].procesos = procesos;
+            p[i].inicio= aumento *i;
+            p[i].fin= (aumento * i)+ aumento;
+            p[i].respuesta=resultado;
+            pthread_create(&(hilos[i]), NULL, (void*) ProcesosInteractivos, (void*) &(p[i ]));
+          }
+          // joineo los hilos
+          for (i = 0; i < cantidad_hilos; i++)
+          { 
+            pthread_join(hilos[i],NULL);
+            //resultado+= *acum;
 
+          }
+          printf("El numero  de procesos nteractivos es de: %f\n", resultado[0]);
+          free(hilos);
+          free(p);
+        }else if(opcion==5){
+           hilos =  malloc(sizeof(pthread_t)*cantidad_hilos);
+          p=malloc((sizeof(Parametro)*cantidad_hilos));
+          for (i = 0; i < cantidad_hilos; i++)
+          { 
+            p[i].procesos = procesos;
+            p[i].inicio= aumento *i;
+            p[i].fin= (aumento * i)+ aumento;
+            p[i].respuesta=resultado;
+            pthread_create(&(hilos[i]), NULL, (void*) EjecucionCancelada, (void*) &(p[i ]));
+          }
+          // joineo los hilos
+          for (i = 0; i < cantidad_hilos; i++)
+          { 
+            pthread_join(hilos[i],NULL);
+            //resultado+= *acum;
+
+          }
+          printf("El numero  de procesos con ejecución`cancelada es de: %f\n", resultado[0]);
+          free(hilos);
+          free(p);
         }
         
         if(opcion!=6){
+          free(procesos);
           printf("Oprima cualquier tecla para continuar \n" );
           scanf("%c",&basura);
           scanf("%c",&basura);
