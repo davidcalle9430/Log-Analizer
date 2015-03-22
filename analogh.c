@@ -62,6 +62,8 @@ int main(int argc, char *argv[])
   int i,contador, contador_lineas, resultado, cantidad_hilos, aumento, cantidad_lineas,opcion;
   double datos[18];
   Proceso* procesos;
+  Parametro *p;
+   pthread_t *hilos;
   //pthread_t* hilos;
 
 
@@ -136,13 +138,10 @@ int main(int argc, char *argv[])
         if(opcion==1){
           // crear la cantidad de hilos que se pasen por parámetro
           //acumulador=(int*) malloc(sizeof(int)*cantidad_hilos);
-          int** acumulador;
-          acumulador  = (int**) malloc(sizeof(int*));
-          (*acumulador) =(int*) malloc(sizeof(int)*cantidad_hilos);
-          //hilos = (pthread_t*) malloc(sizeof(pthread_t)*cantidad_hilos+1);
-          Parametro p[cantidad_hilos];
-          //p=(Parametro*) malloc((sizeof(Parametro)*cantidad_hilos)+2);
-          pthread_t hilos[cantidad_hilos];
+          hilos = (pthread_t*) malloc(sizeof(pthread_t)*cantidad_hilos);
+          //Parametro p[cantidad_hilos];
+          p=(Parametro*) malloc((sizeof(Parametro)*cantidad_hilos));
+          //pthread_t hilos[cantidad_hilos];
           for (i = 0; i < cantidad_hilos; i++)
           { 
           
@@ -165,7 +164,9 @@ int main(int argc, char *argv[])
             resultado+= *pepeiro;
            
           }
-          printf("res: %i\n",resultado );
+          printf("El numero  de procesos que se ejecutó únicamente en un procesador es: %i\n", resultado);
+          free(hilos);
+          free(p);
           //printf("Direccion Impresión FINAL %p y es %i \n",(&(p[0]))->procesos ,(&(p[0]))->procesos[0].numero_procesadores );
           //printf("Direccion Impresión FINAL %p y es %i \n",(&(p[0]))->procesos ,(&(p[0]))->procesos[99].numero_procesadores );
         
