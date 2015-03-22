@@ -27,30 +27,45 @@ typedef struct{
   Proceso* procesos;
   int inicio;
   int fin;
+  int *respuesta;
   
 }Parametro;
 
 
 void* NumeroProcesosUnProcesador(Parametro *parametro){
-  // el valor del parametro es
-  //printf(" dirección de llegada %p\n", parametro);
-  int *retorno, i;
+  int *retorno, i,valor;
   retorno= (int*)malloc(sizeof(int));
   *(retorno)=0;
-  //printf("DURANTE %p\n",parametro->procesos );
+ 
   for (i =parametro->inicio; i < parametro->fin; i++)
   { 
-
-    int a=parametro->procesos[i].numero_procesadores;
-
-    //printf("el valor en %i es %i\n",i, a );
-    if(a==1){
+    valor=parametro->procesos[i].numero_procesadores;
+    if(valor==1){
       *(retorno)= *(retorno)+1;
+      parametro->respuesta[0]++;
     }
   }
-  printf(" al final el retorno es %i \n",*retorno );
-  pthread_exit(retorno);
+  //printf(" al final el retorno es %i \n",*retorno );
+  //pthread_exit(retorno);
 }
+
+void* NumeroProcesosMasDe64(Parametro *parametro){
+  int *retorno, i, valor;
+  retorno= (int*)malloc(sizeof(int));
+  *(retorno)=0;
+ 
+  for (i =parametro->inicio; i < parametro->fin; i++)
+  { 
+     valor=parametro->procesos[i].numero_procesadores;
+    if(valor>=64){
+      *(retorno)= *(retorno)+1;
+      parametro->respuesta[0]++;
+    }
+  }
+  //printf(" al final el retorno es %i \n",*retorno );
+  //pthread_exit(retorno);
+}
+
 
 int main(int argc, char *argv[])
  {      
@@ -59,7 +74,7 @@ int main(int argc, char *argv[])
   char *line, *lee, basura;
   size_t len;
   ssize_t read;
-  int i,contador, contador_lineas, resultado, cantidad_hilos, aumento, cantidad_lineas,opcion;
+  int i,contador, contador_lineas, cantidad_hilos, aumento, cantidad_lineas,opcion, *acum, *resultado;
   double datos[18];
   Proceso* procesos;
   Parametro *p;
@@ -76,8 +91,12 @@ int main(int argc, char *argv[])
       exit(EXIT_FAILURE);
   }else{
     contador_lineas=0;
-    resultado=0;
+    //resultado=0;
     len = 0;
+    resultado= (int*) malloc(sizeof(int)*3);
+    resultado[0]=0;
+    resultado[1]=0;
+    resultado[2]=0;
     
     line = NULL;
     cantidad_hilos= atoi(argv[3]);
@@ -95,10 +114,8 @@ int main(int argc, char *argv[])
           lee=strtok(NULL, " \t");
           contador++;
         }
-      //creo la estructura //1 6 7 5 15 11
       procesos[contador_lineas].numero_tarea = datos[0];
       procesos[contador_lineas].numero_procesadores = datos[4];
-      //printf("original %i: %i\n",cantidad_lineas, procesos[contador_lineas].numero_procesadores);
       procesos[contador_lineas].tiempo_promedio_cpu = datos[5];
       procesos[contador_lineas].memoria_usada = datos[6];
       procesos[contador_lineas].status = datos[10];
@@ -111,7 +128,6 @@ int main(int argc, char *argv[])
 
 
 
-  // ahora es con base en cada opción crear los hilos y llamar a una función en específico
   /*
    pthread_create(&thread1, NULL, (void*) primera_funcion, (void*)&i);
         pthread_create(&thread2, NULL, (void*) segunda_funcion, (void*)&i);
@@ -136,41 +152,50 @@ int main(int argc, char *argv[])
         
       
         if(opcion==1){
-          // crear la cantidad de hilos que se pasen por parámetro
-          //acumulador=(int*) malloc(sizeof(int)*cantidad_hilos);
           hilos = (pthread_t*) malloc(sizeof(pthread_t)*cantidad_hilos);
-          //Parametro p[cantidad_hilos];
           p=(Parametro*) malloc((sizeof(Parametro)*cantidad_hilos));
-          //pthread_t hilos[cantidad_hilos];
           for (i = 0; i < cantidad_hilos; i++)
           { 
-          
             p[i].procesos = procesos;
             p[i].inicio= aumento *i;
             p[i].fin= (aumento * i)+ aumento;
-            //printf("ANTES  %p\n",(&(p[i]))->procesos );
-            
-            pthread_create(&(hilos[i]), NULL, (void*) NumeroProcesosUnProcesador, (void*) &(p[i ]));
-            //printf("DESPUES  %p\n",(p+i)->procesos );
-            //printf("imprimo %i\n",(p+i)->procesos[0].numero_procesadores );
+            p[i].respuesta=&resultado[0];
+            pthread_create(&(hilos[i]), NULL, (void*) NumeroProcesosUnProcesador, (void*) &(p[i]));
           }
           // joineo los hilos
-          int *pepeiro;
           for (i = 0; i < cantidad_hilos; i++)
           { 
-            pthread_join(hilos[i],(void **)&pepeiro);
-            
-            //printf("acum %p\n",(acumulador+i) );
-            resultado+= *pepeiro;
-           
+            pthread_join(hilos[i],(void **)&acum);
+            //resultado+= *acum;
+
           }
-          printf("El numero  de procesos que se ejecutó únicamente en un procesador es: %i\n", resultado);
+          printf("El numero  de procesos que se ejecutó únicamente en un procesador es: %i\n", resultado[0]);
           free(hilos);
           free(p);
-          //printf("Direccion Impresión FINAL %p y es %i \n",(&(p[0]))->procesos ,(&(p[0]))->procesos[0].numero_procesadores );
-          //printf("Direccion Impresión FINAL %p y es %i \n",(&(p[0]))->procesos ,(&(p[0]))->procesos[99].numero_procesadores );
-        
         }else if(opcion==2){
+
+          hilos = (pthread_t*) malloc(sizeof(pthread_t)*cantidad_hilos);
+          p=(Parametro*) malloc((sizeof(Parametro)*cantidad_hilos));
+          for (i = 0; i < cantidad_hilos; i++)
+          { 
+            p[i].procesos = procesos;
+            p[i].inicio= aumento *i;
+            p[i].fin= (aumento * i)+ aumento;
+            p[i].respuesta=resultado;
+            pthread_create(&(hilos[i]), NULL, (void*) NumeroProcesosMasDe64, (void*) &(p[i ]));
+          }
+          // joineo los hilos
+          for (i = 0; i < cantidad_hilos; i++)
+          { 
+            pthread_join(hilos[i],NULL);
+            //resultado+= *acum;
+
+          }
+          printf("El numero  de procesos que se ejecutó únicamente en un procesador es: %i\n", resultado[0]);
+          free(hilos);
+          free(p);
+
+
     
         }else if(opcion==3){
         
