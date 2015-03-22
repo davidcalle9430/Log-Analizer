@@ -11,7 +11,7 @@
     */
     #ifndef SECUENCIAL_H
     #define SECUENCIAL_H
-    int NumeroProcesosUnProcesador(char* nombre_archivo, int total_lineas); ; // prototipo de las funciones
+    int NumeroProcesosUnProcesador(char* nombre_archivo, int total_lineas);// prototipo de las funciones
     int NumeroProcesosMasDe64(char* nombre_archivo, int total_lineas);
     void ProcesoUtilizaMasCPU(char *nombre_archivo, int total_lineas, int resultado[3]);
     int ProcesosInteractivos (char *nombre_archivo, int total_lineas);
