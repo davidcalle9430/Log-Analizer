@@ -15,18 +15,17 @@
 		Cuenta el número de procesos que solo usaron un procesador en el log
 */
 void* NumeroProcesosUnProcesador(Parametro *parametro){
-  int *retorno, i,valor;
-  retorno= (int*)malloc(sizeof(int));
-  *(retorno)=0;
+	int *retorno, i,valor;
+	retorno= (int*)malloc(sizeof(int));
+  	*(retorno)=0;
   
-  for (i =parametro->inicio; i < parametro->fin; i++)
-  { 
-    valor=parametro->procesos[i].numero_procesadores;
-    if(valor==1){
-      *(retorno)= *(retorno)+1;
-      parametro->respuesta[0]++;
-    }
-  }
+  	for (i =parametro->inicio; i < parametro->fin; i++){ 
+    		valor=parametro->procesos[i].numero_procesadores;
+    		if(valor==1){
+      			*(retorno)= *(retorno)+1;
+      			parametro->respuesta[0]++;
+    		}
+  	}
 }
 /*
 	Función: 
@@ -40,14 +39,13 @@ void* NumeroProcesosUnProcesador(Parametro *parametro){
 */
 
 void* NumeroProcesosMasDe64(Parametro *parametro){
-  int *retorno, i, valor;
-  for (i =parametro->inicio; i < parametro->fin; i++)
-  { 
-     valor=parametro->procesos[i].numero_procesadores;
-    if(valor>=64){
-      parametro->respuesta[0]++;
-    }
-  }
+  	int *retorno, i, valor;
+  	for (i =parametro->inicio; i < parametro->fin; i++){ 
+     		valor=parametro->procesos[i].numero_procesadores;
+    		if(valor>=64){
+      			parametro->respuesta[0]++;
+    		}
+  	}
 
 }
 /*
@@ -62,17 +60,16 @@ void* NumeroProcesosMasDe64(Parametro *parametro){
 */
 
 void* NumeroProcesoUtilizaMasCPU(Parametro *parametro){
-  int i;
-  float valor;
-  for (i =parametro->inicio; i < parametro->fin; i++)
-  { 
-     valor=parametro->procesos[i].tiempo_promedio_cpu;
-    if(valor>parametro->respuesta[0]){
-      parametro->respuesta[0]=valor;
-      parametro->respuesta[1]=parametro->procesos[i].numero_tarea;
-      parametro->respuesta[2]=parametro->procesos[i].memoria_usada;
-    }
-  }
+  	int i;
+  	float valor;
+  	for (i =parametro->inicio; i < parametro->fin; i++){ 
+     		valor=parametro->procesos[i].tiempo_promedio_cpu;
+    		if(valor>parametro->respuesta[0]){
+      			parametro->respuesta[0]=valor;
+      			parametro->respuesta[1]=parametro->procesos[i].numero_tarea;
+      			parametro->respuesta[2]=parametro->procesos[i].memoria_usada;
+    		}
+  	}
 }
 /*
 	Función: 
@@ -86,14 +83,13 @@ void* NumeroProcesoUtilizaMasCPU(Parametro *parametro){
 */
 
 void* ProcesosInteractivos(Parametro *parametro){
-  int  i, valor;
-  for (i =parametro->inicio; i < parametro->fin; i++)
-  { 
-     valor=parametro->procesos[i].numero_cola;
-    if(valor==0){
-      parametro->respuesta[0]++;
-    }
-  }
+  	int  i, valor;
+  	for (i =parametro->inicio; i < parametro->fin; i++){ 
+     		valor=parametro->procesos[i].numero_cola;
+    		if(valor==0){
+      			parametro->respuesta[0]++;
+    		}
+  	}
 }
 /*
 	Función: 
@@ -106,12 +102,11 @@ void* ProcesosInteractivos(Parametro *parametro){
 		Cuenta el número de procesos de ejecución cancelada
 */
 void* EjecucionCancelada(Parametro *parametro){
-  int  i, valor;
-  for (i =parametro->inicio; i < parametro->fin; i++)
-  { 
-     valor=parametro->procesos[i].status;
-    if(valor==5){
-      parametro->respuesta[0]++;
-    }
-  }
+  	int  i, valor;
+  	for (i =parametro->inicio; i < parametro->fin; i++){ 
+     		valor=parametro->procesos[i].status;
+    		if(valor==5){
+      			parametro->respuesta[0]++;
+    		}
+  	}
 }
