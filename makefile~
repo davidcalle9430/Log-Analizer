@@ -23,5 +23,5 @@ hilos: Hilos.o Analogh.o
 Hilos.o: Hilos/hilos.o Hilos/hilos.h
 	gcc -lpthread -c Hilos/hilos.c 
 Analogh.o: Hilos/analogh.o Hilos.o
-	gcc -lpthread -c Hilos/analogh.c
+	gcc  -lpthread -c Hilos/analogh.c
 
