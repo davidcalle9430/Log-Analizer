@@ -16,8 +16,10 @@
 
    int main(int argc, char *argv[])
    {   
-	int resultado, opcion, resultado3[3];
+	int resultado, opcion, total_lineas;
+	float resultado3[3];
 	char basura;
+	Proceso* memoria;
 
 	basura=' ';
 	resultado=0;
@@ -27,6 +29,9 @@
 		printf("Cantidad de argumentos incorrectos\n");
      		exit(1);
    	}else{
+		total_lineas=atoi(argv[2]);
+		memoria= malloc (sizeof (Proceso)*total_lineas);
+		leerArchivo (argv[1], memoria, total_lineas);
 		while (opcion!=6){
 			printf("1. Número de procesos que se ejecutó únicamente en un procesador.\n ");
 			printf("2. Numero de procesos que se ejecutó en 64 o más procesadores.\n");
@@ -38,26 +43,31 @@
 			scanf("%d",&opcion);
 			printf("\e[1;1H\e[2J");
 			
+			struct timeval start, end;
+  			gettimeofday(&start, NULL);
 		
 	  		if(opcion==1){
-	   			resultado= NumeroProcesosUnProcesador(argv[1], atoi(argv[2]));
+	   			resultado= NumeroProcesosUnProcesador(memoria, total_lineas);
 				printf("El numero  de procesos que se ejecutó únicamente en un procesador es: %d\n", resultado);
 			}else if(opcion==2){
-				resultado= NumeroProcesosMasDe64(argv[1], atoi(argv[2]));
+				resultado= NumeroProcesosMasDe64(memoria, total_lineas);
 				printf("El numero de procesos que se ejecutó en 64 o más procesadores es: %d\n", resultado);
 	        	}else if(opcion==3){
-	        		ProcesoUtilizaMasCPU(argv[1], atoi(argv[2]), resultado3);
-				printf("Proceso que utilizó más CPU: %d  ;", resultado3[0] );
-				printf("Tiempo de uso de CPU: %d  ;", resultado3[1]);
-				printf("Memoria utilizada: %d\n", resultado3[2]);	
+	        		ProcesoUtilizaMasCPU(memoria, total_lineas, resultado3);
+				printf("Proceso que utilizó más CPU: %f  ;", resultado3[0] );
+				printf("Tiempo de uso de CPU: %f  ;", resultado3[1]);
+				printf("Memoria utilizada: %f\n", resultado3[2]);	
 	        	}else if(opcion==4){
-	        		resultado = ProcesosInteractivos(argv[1], atoi(argv[2]));
+	        		resultado = ProcesosInteractivos(memoria, total_lineas);
 				printf("La cantidad de procesos Interactivos es: %d\n", resultado);
 	        	}else if(opcion==5){
-	        		resultado = EjecucionCancelada(argv[1], atoi(argv[2]));
+	        		resultado = EjecucionCancelada(memoria, total_lineas);
 	        		printf("Número de procesos cuya ejecución fue cancelada por el administrador es: %d\n", resultado);
 			}
 			if(opcion!=6){
+				gettimeofday(&end, NULL);
+  				printf("%ld\n", ((end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)));
+
 				printf("Oprima cualquier tecla para continuar \n" );
 	            		scanf("%c",&basura);
 	            		scanf("%c",&basura);
@@ -65,5 +75,5 @@
 			}
 	
 	   	}
-		} 
+	} 
    }

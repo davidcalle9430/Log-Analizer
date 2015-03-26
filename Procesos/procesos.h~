@@ -9,8 +9,9 @@
      Fecha Última Modificación:
       	Marzo 21 de 2015
     */
-    #ifndef SECUENCIAL_H
-    #define SECUENCIAL_H
+
+    #ifndef PROCESOS_H
+    #define PROCESOS_H
 	typedef struct{
  		//1 6 7 5 15 11
 		int numero_tarea;
@@ -32,11 +33,13 @@
 		//int tarea_anterior;
 		//int tiempo_reflexion;
 	} Proceso;
-	void leerArchivo (char* nombre_archivo, Proceso* procesos, int total_lineas);
-    	int NumeroProcesosUnProcesador(Proceso* procesos, int total_lineas);// prototipo de las funciones
-    	int NumeroProcesosMasDe64(Proceso* procesos, int total_lineas);
-    	void ProcesoUtilizaMasCPU(Proceso* procesos, int total_lineas, float resultado[3]);
-    	int ProcesosInteractivos (Proceso* procesos, int total_lineas);
-    	int EjecucionCancelada (Proceso* procesos, int total_lineas);
-   // #include "secuencial.c"
+	void leerArchivo(char* archivo, Proceso** procesos, int lineas);
+	int NumeroProcesosUnProcesador( int inicio, int fin, Proceso** procesos);
+	int NumeroProcesosMasDe64( int inicio, int fin, Proceso** procesos);
+	int SumaDeRespuestas (float** respuestas, int cant_procesos);
+	void ProcesoUtilizaMasCPU( int inicio, int fin, Proceso** procesos, float respuestas[]);
+	void MayorTiempo (float** respuestas, float respuestas_finales[], int cant_procesos, int cant_respuestas);
+	int ProcesosInteractivos( int inicio, int fin, Proceso** procesos);
+    	int EjecucionCancelada( int inicio, int fin, Proceso** procesos);
+   // #include "procesos.c"
     #endif

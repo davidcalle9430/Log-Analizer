@@ -144,7 +144,7 @@ int main(int argc, char *argv[]){
             					acum_hilos+=responsabilidad_lineas[i];
             					p[i].fin= acum_hilos;
             					p[i].respuesta=resultado;
-            					pthread_create(&(hilos[i]), NULL, (void*) NumeroProcesoUtilizaMasCPU, (void*) &(p[i ]));
+            					pthread_create(&(hilos[i]), NULL, (void*) NumeroProcesosUtilizaMasCPU, (void*) &(p[i ]));
           				}
           				for (i = 0; i < cantidad_hilos; i++){ 
             					pthread_join(hilos[i],NULL);

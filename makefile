@@ -1,12 +1,29 @@
 # PROYECTO #1 - Makefile para generar 2 ejecutables
 # 
 
-all: secuencial procesos hilos
+all: secuencial hilos procesos clean
+# falta procesos
+secuencial: Secuencial.o Analogs.o
+	gcc Secuencial/secuencial.o Secuencial/analogs.o -o Secuencial/ejecutable
+Secuencial.o: Secuencial/secuencial.o Secuencial/secuencial.h
+	gcc -c Secuencial/secuencial.c
+Analogs.o: Secuencial/analogs.o Secuencial.o
+	gcc -c Secuencial/analogs.c
 
-secuencial: 
-	gcc -o Secuencial/ejecutableSecuencial Secuencial/analogs.c
-procesos:
-	gcc -o Procesos/ejecutableProcesos Procesos/analogp.c
-hilos:
-	gcc -o  Hilos/ejecutableHilos Hilos/analogh.c -lpthread
+procesos: Procesos.o Analogp.o
+	gcc Procesos/procesos.o Procesos/analogp.o -o Procesos/ejecutable
+Procesos.o: Procesos/procesos.o Procesos/procesos.h
+	gcc -c Procesos/procesos.c
+Analogp.o: Procesos/analogp.o Procesos.o
+	gcc -c Procesos/analogp.c
+
+hilos: Hilos.o Analogh.o
+	gcc Hilos/hilos.o Hilos/analogh.o -o Hilos/ejecutable -lpthread
+Hilos.o: Hilos/hilos.o Hilos/hilos.h
+	gcc -lpthread -c Hilos/hilos.c 
+Analogh.o: Hilos/analogh.o Hilos.o
+	gcc -lpthread -c Hilos/analogh.c
+clean: 
+	rm -rf */*.o
+	rm -rf *.o
 

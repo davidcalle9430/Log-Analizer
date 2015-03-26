@@ -29,7 +29,7 @@
 
     void* NumeroProcesosUnProcesador(Parametro *parametro) ; // prototipo de las funciones
     void* NumeroProcesosMasDe64(Parametro *parametro);
-    void* NumeroProcesoUtilizaMasCPU(Parametro *parametro);
+    void* NumeroProcesosUtilizaMasCPU(Parametro *parametro);
     void* ProcesosInteractivos(Parametro *parametro);
     void* EjecucionCancelada(Parametro *parametro);
   //  #include "hilos.c"

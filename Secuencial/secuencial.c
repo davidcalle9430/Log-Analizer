@@ -9,11 +9,49 @@
      Fecha Última Modificación:
       	Marzo 21 de 2015
     */	
-	#include <stdio.h> //librerías de C
-	#include <stdlib.h>
-	#include <string.h>
-	#include "secuencial.h" // Archivo de cabecera con la definción de las funciones
-	/*
+#include <stdio.h> //librerías de C
+#include <stdlib.h>
+#include <string.h>
+#include "secuencial.h" // Archivo de cabecera con la definción de las funciones
+void leerArchivo (char* archivo, Proceso* procesos, int total_lineas){
+	int contador_lineas=0, contador;
+ 	int resultado=0;
+ 	size_t len = 0;
+	ssize_t read;
+ 	char *line = NULL;
+	char * lee;
+	double datos[18];
+ 	FILE * fp;
+	fp = fopen(archivo, "r");
+	if (fp == NULL){
+	    	printf("El archivo con el nombre especificado no existe\n");
+    		exit(EXIT_FAILURE);
+	}else{	
+		while ( (read = getline(&line, &len, fp)) != -1 ) {        
+			if( line[0]!=';'&&contador_lineas<total_lineas){
+
+				lee=strtok(line, " \t" );
+				contador=0;
+				while(lee != NULL) { 
+			   		datos[contador]=atof(lee); 
+  					lee=strtok(NULL, " \t");
+  					contador++;
+				}
+				//creo la estructura //1 6 7 5 15 11
+				procesos[contador_lineas].numero_tarea=datos[0];
+				procesos[contador_lineas].numero_procesadores=datos[4];
+				procesos[contador_lineas].tiempo_promedio_cpu=datos[5];
+				procesos[contador_lineas].memoria_usada=datos[6];
+				procesos[contador_lineas].status=datos[10];
+				procesos[contador_lineas].numero_cola=datos[14];
+
+   		    		contador_lineas++;
+			}      
+		}
+	}
+	fclose(fp);
+}
+/*
 	Función: 
 		NumeroProcesosUnProcesador
 	Parámetros de Entrada: 
@@ -23,46 +61,18 @@
 	Descripción:
 		Cuenta el número de procesos que solo usaron un procesador en el log
 	*/
-	int NumeroProcesosUnProcesador(char* nombre_archivo, int total_lineas){
-		FILE * fp;
-     	char *line, *lee;
-     	size_t len;
-     	ssize_t read;
-     	int numero, contador, contador_lineas, resultado,i;
-     	double datos[18];
-     	
 
-     	contador_lineas=0;
-     	resultado=0;
-     	len = 0;
-     	line = NULL;
-    	fp = fopen(nombre_archivo, "r");
-    	
-
-   		if (fp == NULL){
-   		   printf("El archivo con el nombre especificado no existe\n");
-           exit(EXIT_FAILURE);
-   		}else{	
-  			while ( (read = getline(&line, &len, fp)) != -1 ) {        
-   				if( line[0]!=';'&&contador_lineas<total_lineas){
-
-       				lee=strtok(line, " \t" );
-       				contador=0;
-       				while(lee != NULL) { 
-					   	datos[contador]=atof(lee); 
-          				lee=strtok(NULL, " \t");
-          				contador++;
-      				}
-      			    if(datos[4]==1){
-          				resultado++;
-          			}
-           		    contador_lineas++;
-        		}      
-      		}	
-        }
-		fclose(fp);
-		return resultado;
+int NumeroProcesosUnProcesador(Proceso* procesos, int total_lineas){
+	int resultado, i;
+	resultado=0;
+	for(i=0; i<total_lineas; i++){
+		if(procesos[i].numero_procesadores==1){
+			resultado++;
+		}
 	}
+
+	return resultado;
+}
 
 	/*
 	Función:
@@ -74,52 +84,18 @@
 	Descripción:
 		Cuenta el número de procesos que usaron 64 procesadores
 	*/	
-    int NumeroProcesosMasDe64(char* nombre_archivo, int total_lineas){
-		FILE * fp;
-     	char *line,*lee;
-     	size_t len;
-     	ssize_t read;
-     	int numero, contador, contador_lineas, resultado,i;
-     	double datos[18];
-
-
-     	contador_lineas=0;
-     	resultado=0;
-     	len = 0;
-     	line = NULL;
-    	fp = fopen(nombre_archivo, "r");
-    	
-
-   		if (fp == NULL){
-   		   printf("El archivo con el nombre especificado no existe\n");
-           exit(EXIT_FAILURE);
-   		}else{
-  			while ( (read = getline(&line, &len, fp)) != -1 ) {        
-   				if( line[0]!=';'&&contador_lineas<total_lineas){
-       				lee=strtok(line, " \t" );
-       				contador=0;
-       				while(lee != NULL) { 
-					   	datos[contador]=atof(lee); 
-          				lee=strtok(NULL, " \t");
-          				contador++;
-      				}
-      			    if(datos[4]>=64){
-          				resultado++;
-          			}
-           		    contador_lineas++;
-        		}      
-      		}
-      	}
-		fclose(fp);
-		return resultado;
+int NumeroProcesosMasDe64(Proceso* procesos, int total_lineas){
+	int resultado, i;
+	resultado=0;
+	for(i=0; i<total_lineas; i++){
+		if(procesos[i].numero_procesadores>=64){
+			resultado++;
+		}
 	}
 
-
-
-
-
-
-	/*
+	return resultado;
+}
+/*
 	Función: ProcesoUtilizaMasCPU
 	Parámetros de Entrada: 
 		Cadena con el nombre del archivo a buscar, representa el log
@@ -129,46 +105,19 @@
 		Cuenta el número de procesos que usaron 64 procesadores
 	*/	
 
+void ProcesoUtilizaMasCPU(Proceso* procesos, int total_lineas, float resultado[3]){
+	int i, tiempo_mayor;
+	tiempo_mayor=0;
+	for(i=0; i<total_lineas; i++){
+		if(procesos[i].tiempo_promedio_cpu>tiempo_mayor){
+			tiempo_mayor=procesos[i].tiempo_promedio_cpu;
+			resultado[0]= procesos[i].numero_tarea;
+			resultado[1]= procesos[i].tiempo_promedio_cpu;
+			resultado[2]= procesos[i].memoria_usada;
+		}
+	}     
 
-    void ProcesoUtilizaMasCPU(char *nombre_archivo,  int total_lineas, int resultado[3]){
-		FILE * fp;
-     	char * line, *lee;
-     	ssize_t read;
-     	double datos[18], tiempo_mayor;
-     	int numero, contador, contador_lineas,i;
-     	
-
-     	line = NULL;
-     	size_t len = 0;
-     	contador_lineas=0;
-     	tiempo_mayor=0.0;
-
-
-    	fp = fopen(nombre_archivo, "r");
-   		if (fp == NULL){
-           exit(EXIT_FAILURE);
-   		}	
-  		while ( (read = getline(&line, &len, fp)) != -1 ) {        
-   			if( line[0]!=';'&&contador_lineas<total_lineas){
-       				lee=strtok(line, " \t" );
-       				contador=0;
-       				while(lee != NULL) { 
-					   	datos[contador]=atof(lee); 
-          				lee=strtok(NULL, " \t");
-          				contador++;
-      				}
-      				//TiempoMayor (datos[0], datos[5], datos[6]);
-      				if(datos[5]>tiempo_mayor){
-      					tiempo_mayor=datos[5];
-      					resultado[0]=datos[0];
-      					resultado[1]=datos[5];
-      					resultado[2]=datos[6];
-      				}
-           		    contador_lineas++;
-        	}      
-      	}
-		fclose(fp);
-	}
+}
 	
    /*
 		Función: 
@@ -180,81 +129,36 @@
 		Descripción: 
 			Cuenta directamente del archivo los procesos que son interactivos
 	*/
-	int ProcesosInteractivos (char *nombre_archivo, int total_lineas){
-		FILE * fp;
-     	char * line;
-     	char *lee;
-     	size_t len;
-     	ssize_t read;
-     	int numero, columna, contador_lineas, i, resultado;
-		resultado=0;
-		len = 0;
-		line=NULL;
-    	fp = fopen(nombre_archivo, "r");
-   		if (fp == NULL){
-           exit(EXIT_FAILURE);
-   		}	
+int ProcesosInteractivos (Proceso* procesos, int total_lineas){
 
-   		contador_lineas=0;
-
-  		while ( (read = getline(&line, &len, fp)) != -1 ) {        
-   			if( line[0]!=';'&&contador_lineas<total_lineas){	
-       				lee=strtok(line, " \t" );
-       				columna=1;
-       				while(lee != NULL) { 
-          				if (columna==15&&strcmp(lee, "0")==0){
-							resultado++;
-						}
-						lee=strtok(NULL, " \t");
-          				columna++;
-      				}
-      				contador_lineas++;
-        	}      
-      	}
-		fclose(fp);
-		return resultado;
+	int resultado, i;
+	resultado=0;
+	for(i=0; i<total_lineas; i++){
+		if(procesos[i].numero_cola==0){
+			resultado++;
+		}
 	}
-	/*
-		Función: 
-			EjecucionCancelada
-		Parámetros de entrada: 
-			Nombre del archivo del log, y el total de lineas a analizar
-		Valor de salida: 
-			cantidad de Procesos cancelados por el administrador
-		Descripción: 
-			Cuenta directamente del archivo los procesos que fueron cancelados por el administrador
+
+	return resultado;
+}
+/*
+	Función: 
+		EjecucionCancelada
+	Parámetros de entrada: 
+		Nombre del archivo del log, y el total de lineas a analizar
+	Valor de salida: 
+		cantidad de Procesos cancelados por el administrador
+	Descripción: 
+		Cuenta directamente del archivo los procesos que fueron cancelados por el administrador
 	*/
-	int EjecucionCancelada (char *nombre_archivo, int total_lineas){
-		FILE * fp;
-     	char * line;
-     	char *lee;
-     	size_t len;
-     	ssize_t read;
-     	int numero, columna, contador_lineas, i, resultado;
-		resultado=0;
-		len = 0;
-		line=NULL;
-    	fp = fopen(nombre_archivo, "r");
-   		if (fp == NULL){
-           exit(EXIT_FAILURE);
-   		}	
-
-   		contador_lineas=0;
-
-  		while ( (read = getline(&line, &len, fp)) != -1 ) {        
-   			if( line[0]!=';'&&contador_lineas<total_lineas){	
-       				lee=strtok(line, " \t" );
-       				columna=1;
-       				while(lee != NULL) { 
-          				if (columna==11&&strcmp(lee, "5")==0){
-							resultado++;
-						}
-						lee=strtok(NULL, " \t");
-          				columna++;
-      				}
-      				contador_lineas++;
-        	}      
-      	}
-		fclose(fp);
-		return resultado;
+int EjecucionCancelada (Proceso* procesos, int total_lineas){
+	int resultado, i;
+	resultado=0;
+	for(i=0; i<total_lineas; i++){
+		if(procesos[i].status==5){
+			resultado++;
+		}
 	}
+
+	return resultado;
+}
