@@ -10,7 +10,6 @@ Secuencial.o: Secuencial/secuencial.o Secuencial/secuencial.h
 	gcc -c Secuencial/secuencial.c
 Analogs.o: Secuencial/analogs.o Secuencial.o
 	gcc -c Secuencial/analogs.c
-
 procesos: Procesos.o Analogp.o
 	gcc Procesos/procesos.o Procesos/analogp.o -o Procesos/ejecutable
 Procesos.o: Procesos/procesos.o Procesos/procesos.h

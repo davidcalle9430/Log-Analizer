@@ -11,6 +11,7 @@
     */
     #ifndef HILOS_H
     #define HILOS_H
+    #include <pthread.h>
     typedef struct{
   	int numero_tarea;
   	int numero_procesadores;
@@ -32,5 +33,4 @@
     void* NumeroProcesoUtilizaMasCPU(Parametro *parametro);
     void* ProcesosInteractivos(Parametro *parametro);
     void* EjecucionCancelada(Parametro *parametro);
-  //  #include "hilos.c"
     #endif
